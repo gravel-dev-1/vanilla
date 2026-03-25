@@ -45,7 +45,7 @@ func main() {
 	defer stop()
 
 	go func() {
-		if err := app.Listen(":8080"); err != nil {
+		if err := app.Listen(":8080", fiber.ListenConfig{GracefulContext: ctx}); err != nil {
 			log.Println(err)
 		}
 	}()
