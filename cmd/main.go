@@ -8,8 +8,8 @@ import (
 	"os/signal"
 
 	"gbfw/internal/bootstrap"
-	"gbfw/internal/controllers"
 	"gbfw/internal/env"
+	"gbfw/internal/handlers"
 	"gbfw/internal/vite"
 
 	"github.com/gofiber/fiber/v3"
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	api := app.Group("/api")
-	api.Get("/health", controllers.Health)
+	api.Get("/health", handlers.Health)
 	api.Use(func(c fiber.Ctx) error { return c.SendStatus(fiber.StatusNotFound) })
 
 	app.Use(static.New("", static.Config{FS: viteFS}))

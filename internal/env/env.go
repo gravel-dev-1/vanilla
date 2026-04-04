@@ -3,6 +3,7 @@ package env
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/joho/godotenv"
 )
@@ -16,28 +17,33 @@ const (
 	EnvironmentProduction  Environment = "production"
 )
 
-var environment Environment
+var (
+	environment Environment
+	once        sync.Once
+)
 
 func Load() (err error) {
-	// Load .env if exists else fail silently
-	if err = godotenv.Load(); err != nil && !os.IsNotExist(err) {
-		return
-	}
+	once.Do(func() {
+		// Load .env if exists else fail silently
+		if err = godotenv.Load(); err != nil && !os.IsNotExist(err) {
+			return
+		}
 
-	environment = Environment(os.Getenv(EnvironmentKey))
-	switch environment {
-	case EnvironmentDevelopment, EnvironmentProduction:
-		return
-	default:
-		return fmt.Errorf(
-			"unexpected %s value: expected: %q or %q, got %q",
-			EnvironmentKey,
-			EnvironmentDevelopment,
-			EnvironmentProduction,
-			environment,
-		)
-	}
-
+		environment = Environment(os.Getenv(EnvironmentKey))
+		switch environment {
+		case EnvironmentDevelopment, EnvironmentProduction:
+			return
+		default:
+			err = fmt.Errorf(
+				"unexpected %s value: expected: %q or %q, got %q",
+				EnvironmentKey,
+				EnvironmentDevelopment,
+				EnvironmentProduction,
+				environment,
+			)
+		}
+	})
+	return err
 }
 
 func Getenv[T ~string](key T, defaultValue T) T {
