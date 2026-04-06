@@ -35,7 +35,7 @@ func main() {
 	api.Use(func(c fiber.Ctx) error { return c.SendStatus(fiber.StatusNotFound) })
 
 	app.Use(static.New("", static.Config{FS: vite.FS}))
-	app.Use(func(c fiber.Ctx) error { return c.SendFile("index.html", fiber.SendFile{FS: vite.FS}) })
+	app.Use(func(c fiber.Ctx) error { return c.SendFile("/index.html", fiber.SendFile{FS: vite.FS}) })
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer stop()

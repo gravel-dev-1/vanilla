@@ -25,7 +25,7 @@ var (
 func Load() (err error) {
 	once.Do(func() {
 		// Load .env if exists else fail silently
-		if err = godotenv.Load(); err != nil && !os.IsNotExist(err) {
+		if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
 			return
 		}
 
