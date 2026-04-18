@@ -26,7 +26,7 @@ func (s *Service) Start(context.Context) (err error) {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err = cmd.Start()
-		s.FS = os.DirFS("internal/services/vite/dev")
+		s.FS = FS([]fs.FS{os.DirFS("internal/services/vite/dev"), os.DirFS("public")})
 	}
 	return err
 }
@@ -34,3 +34,14 @@ func (s *Service) Start(context.Context) (err error) {
 func (s *Service) String() string                        { return ServiceName }
 func (s *Service) State(context.Context) (string, error) { return "", nil }
 func (s *Service) Terminate(context.Context) error       { return nil }
+
+type FS []fs.FS
+
+func (f FS) Open(name string) (file fs.File, err error) {
+	for _, filesystem := range f {
+		if file, err = filesystem.Open(name); file != nil {
+			return file, err
+		}
+	}
+	return nil, fs.ErrNotExist
+}
